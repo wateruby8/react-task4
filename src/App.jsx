@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import * as bootstrap from "bootstrap";
 import ProductModal from "./components/ProductModal";
+import Pagination from "./components/Pagination";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 const API_PATH = import.meta.env.VITE_API_PATH;
@@ -30,6 +31,7 @@ function App() {
   const [products, setProducts] = useState([]);
   const [templateProduct, setTemplateProduct] = useState(INITIAL_TEMPLATE_DATA);
   const [modalType, setModalType] = useState("");
+  const [pagination, setPagination]=useState({});
 
   const productModalRef = useRef(null);
 
@@ -103,12 +105,13 @@ function App() {
   };
 
   // 獲取產品列表資料
-  const getProducts = async () => {
+  const getProducts = async (page=1) => {
     try {
       const response = await axios.get(
-        `${API_BASE}/api/${API_PATH}/admin/products`,
+        `${API_BASE}/api/${API_PATH}/admin/products?page=${page}`,
       );
       setProducts(response.data.products);
+      setPagination(response.data.pagination);
     } catch (error) {
       console.log("取得資料失敗：", error.response?.data);
     }
@@ -279,6 +282,7 @@ function App() {
                 ))}
               </tbody>
             </table>
+            <Pagination pagination={pagination} onChangePage={getProducts}/>
           </div>
         </div>
       ) : (
